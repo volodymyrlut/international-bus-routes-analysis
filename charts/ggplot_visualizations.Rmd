@@ -1,0 +1,65 @@
+---
+title: "Charts"
+author: "Volodymyr Lut"
+date: "6/20/2019"
+output: pdf_document
+---
+
+I will draw a simple direction map using this (https://www.r-graph-gallery.com/how-to-draw-connecting-routes-on-map-with-r-and-great-circles/) and this (https://lucidmanager.org/create-air-travel-route-maps/) articles.
+
+```{r}
+library(tidyverse)
+library(ggmap)
+library(ggrepel)
+library(dplyr)
+# TODO: Don't forget to citation("ggmap") in Latex!
+```
+
+```{r}
+poland_bus_routes_geocoded <- read.csv('../poland_bus_routes_geocoded.csv')
+```
+
+
+```{r}
+data <- poland_bus_routes_geocoded %>% group_by(id) %>% filter(stop_number == max(stop_number) | stop_number == 0) %>% select(id, lat, lng, city)
+```
+
+
+```{r}
+data <- data %>% drop_na(lat, lng)
+data$city_finish <- NA
+data$lng_finish <- NA
+data$lat_finish <- NA
+for(id in unique(data$id)){
+  subs <- data[which(data$id == id),]
+  if(nrow(subs) == 2) {
+    destination <- subs[2,]
+    start <- subs[1,]
+    if(!(start$lat == destination$lat && start$lng == destination$lng)){
+      data[which(data$id == id),][1,]$city_finish <- destination$city
+      data[which(data$id == id),][1,]$lat_finish <- destination$lat
+      data[which(data$id == id),][1,]$lng_finish <- destination$lng  
+    }
+  } 
+}
+
+data <- data %>% drop_na(lat, lng, lat_finish, lng_finish)
+```
+
+```{r}
+polmap <- ggmap::get_map(c(lon=26.987, lat=49.423), zoom=5, maptype='terrain')
+```
+
+```{r}
+map.plot <- ggmap(polmap)
+map.plot + 
+    geom_point(data = data, aes(x = lng, y = lat), col = "#970027") + 
+    geom_point(data = data, aes(x = lng_finish, y = lat_finish), col = "red") + 
+    geom_curve(data = data, aes(x = lng , y = lat, xend = lng_finish, yend = lat_finish), 
+               col = "#b29e7d", size = .4) + 
+    theme_void() +
+    coord_cartesian()
+```
+
+ geom_text_repel(data = airports, aes(x = lon, y = lat, label = airport), 
+                    col = "black", size = 2, segment.color = NA) + 
