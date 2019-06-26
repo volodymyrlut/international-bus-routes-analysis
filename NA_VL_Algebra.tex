@@ -1,0 +1,317 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% University Assignment Title Page 
+% LaTeX Template
+% Version 1.0 (27/12/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% WikiBooks (http://en.wikibooks.org/wiki/LaTeX/Title_Creation)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+% 
+% Instructions for using this template:
+% This title page is capable of being compiled as is. This is not useful for 
+% including it in another document. To do this, you have two options: 
+%
+% 1) Copy/paste everything between \begin{document} and \end{document} 
+% starting at \begin{titlepage} and paste this into another LaTeX file where you 
+% want your title page.
+% OR
+% 2) Remove everything outside the \begin{titlepage} and \end{titlepage} and 
+% move this file to the same directory as the LaTeX file you wish to add it to. 
+% Then add \input{./title_page_1.tex} to your LaTeX file where you want your
+% title page.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\title{Title page with logo}
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[12pt]{article}
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{indentfirst}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+
+\textheight=240truemm \textwidth=160truemm 
+\hoffset=-10truemm \voffset=-20truemm
+
+\begin{document}
+\begin{titlepage}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
+
+\center % Center everything on the page
+ 
+%----------------------------------------------------------------------------------------
+%	HEADING SECTIONS
+%----------------------------------------------------------------------------------------
+
+\textsc{\LARGE Ukrainian Catholic University}\\[1cm] % Name of your university/college
+\textsc{\Large  Faculty of Applied Sciences}\\[0.5cm] % Major heading such as course name
+\textsc{\large Data Science Master Programme}\\[0.5cm] % Minor heading such as course title
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+\vspace*{1cm}
+
+\HRule \\[0.4cm]
+{ \huge \bfseries Noise reduction techniques based on Singular Value Decomposition}\\[10pt]
+{\Large \bfseries Linear Algebra final project report}\\[0.4cm] % Title of your document
+\HRule \\[1cm]
+ 
+%----------------------------------------------------------------------------------------
+%	AUTHOR SECTION
+%----------------------------------------------------------------------------------------
+\vspace*{1cm}
+
+% If you don't want a supervisor, uncomment the two lines below and remove the section above
+\Large \textsc{Authors:}\\
+\textsc{Nazariy Perepichka}\\ \textsc{Volodymyr Lut}\\[1cm] % Your name
+
+%----------------------------------------------------------------------------------------
+%	DATE SECTION
+%----------------------------------------------------------------------------------------
+\vspace*{1cm}
+{\large \today}\\[2cm] % Date, change the \today to a set date if you want to be precise
+
+%----------------------------------------------------------------------------------------
+%	LOGO SECTION
+%----------------------------------------------------------------------------------------
+
+\includegraphics[height=5cm]{UCU-Apps.png}\\[1cm] % Include a department/university logo - this will require the graphicx package
+ 
+%----------------------------------------------------------------------------------------
+
+\vfill % Fill the rest of the page with whitespace
+
+\end{titlepage}
+
+\cleardoublepage
+\pagenumbering{roman}
+\tableofcontents
+\cleardoublepage
+\pagenumbering{arabic}
+
+\begin{abstract}
+Singular Value Decomposition algorithm, undoubtedly, belongs to the Hall of Fame of linear algebra algorithms. There are plenty of materials available on the web about its nature and applications. Despite a massive amount of information, most of the well-written materials and examples concentrate on image compression problem. We decided to dedicate this article to noise reduction techniques based on SVD, because of lack of well-structured materials regarding this application. Our primary goal is to structurize information, that we processed and to help readers make the first steps in this direction. In this paper, we are applying SVD to the audio stream trying to remove noise and echo from the sound.
+\end{abstract}
+
+\section{Introduction}
+
+The paper is organized as follows. In Section 2 we briefly remind central concepts of linear algebra to understand general context of our work and trying to provide readers with an intuition behind SVD, in Section 3 we describe the structure of GitHub repository which contains implementations of algorithms described in Section 4. In Section 5 we draw conclusions and discuss further possible improvements.
+
+\section{Theory behind SVD}
+
+Let's start our journey with brief reminding of the core definitions of linear algebra and introducing the SVD method. In case of lack of understanding, feel free to check out refereces[1][2] for a more profound explanation of them.
+
+\subsection{Eigenvalues and Eigenvectors}
+
+Let A be defined as follows: 
+\[
+A \in \mathbb{R}^{n \times n}, n \in \mathbb{N}
+\]
+If there exists any non-zero vector $v$ such that 
+\[
+Av = \lambda v
+\]
+we call $\lambda$ an \textbf{eigenvalue} of A and $v$ is called an corresponding \textbf{eigenvector} of A.
+
+\subsection{Rank}
+
+For matrix $A \in \mathbb{R}^{m \times n}, m,n \in \mathbb{N}$ where $rank(A)$ is equal to number of linearly independent columns $rank(A)$ is the dimension of the vector space generated by its columns.
+
+\subsection{Orthogonal matrix}
+Matrix $A \in \mathbb{R}^{n \times n}, n \in \mathbb{N}$ is an orthogonal matrix if its columns and rows are orthogonal unit vectors (also called orthonormal vectors).
+Orthogonal matrices have following properties:
+\[
+	A^TA=AA^T=I,
+\]
+\[
+	A^{-1} = A^T 
+\]
+
+\subsection{Singular Value Decomposition}
+\textbf{Theorem.} $\forall A \in \mathbb{C}^{m \times n}, m, n \in \mathbb{N}$ exist factorization called a 'singular value decomposition', which looks as following:
+\[
+A = U \Sigma V^T
+\]
+Where:
+\begin{itemize}
+	\item $U$ is a matrix of size $m \times m$ of \textbf{left singular vectors}
+	\item $\Sigma$ is diagonal matrix of size $m \times n$ with non-negative real numbers on the diagonal, so called \textbf{singular values}(square root of eigenvalues of $A^TA$ matrix)
+	\item V is a matrix of size $n \times n$ of \textbf{right singular vectors}
+\end{itemize}
+
+This can be rewritten in following form:
+\[
+A = \sum_{i}\sigma_iu_i  \cdot  v_i^T
+\]
+
+Where U, $\Sigma$ are unique, U and V are orthogonal. 
+\newline
+\textbf{Theorem.} Reconstruction $A_k$ of matrix $A$, given as  
+\[
+A_k = \sum_{i = 1}^k\sigma_iu_i  \cdot  v_i^T
+\]
+is the best approximation of $A$ of rank $k$.
+\newline
+All matrices have an SVD, which makes it more stable than other methods, such as the eigendecomposition. As such, it is often used in a wide array of applications including compressing, denoising, and data reduction.
+
+\subsection{Geometrical interpretation}
+As shown on Figure 1: geometrical interpretation of the SVD is following:
+\newline
+Any $m \times n$ matrix $A$ maps the 2-norm unit sphere in $\mathbb{R}^n$ to an ellipsoid in $\mathbb{R}^r (r \leq min(m,n))$.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{SVD_geometrical_interpretation.jpg}
+	\caption{\label{fig:geom_interpretation}Geometrical interpretation of SVD}
+\end{figure}
+
+\subsection{Intuition}
+You probably know that feeling when you can spoil a dish with an inappropriate ingredient or with an unexpected amount of needed ingredient? There is some nature behind dishes, and it's common sense that they rely deeply on their ingredients. Adding too many mushrooms and just a bit of beet would make borsch more like mushroom soup. On the other hand, adding fennel or sour cream are not so crucial for borsch to be borsch.[3]
+\newline
+In the context of flavor, SVD allows us to decompose matrix of taste in vectors corresponding to each ingredient unique flavor and magnitude of its impact.
+\newline
+Later with SVD, we can reconstruct the most borsch-like approximation with a limited amount (k) of ingredients to use.
+
+\section{Structure of GitHub repository}
+All the supportive code can be found in our GitHub repository [4].
+The repository consists of three folders, .gitignore file, and Jupyter notebook.
+Below we provide the description for folders:
+\begin{itemize}
+	\item \texttt{data} - contains .wav files used for noise filtering and results of different approaches for filtering
+	\item \texttt{utils} - contains three scripts:
+		\begin{enumerate}
+			\item \texttt{filter\char`_util.py} - contains implementation of windowed algorithm
+			\item \texttt{svd\char`_util.py} - contains implementation of reduced svd and function for restoring matrices with given U, E and V matrices
+			\item \texttt{wav\char`_util.py} - functionality for manipulation with .wav files
+		\end{enumerate}
+\end{itemize}
+In \texttt{noise\char`_reduction\char`_demonstration.ipynb} notebook you can find implementation of all the steps discussed in "Noise filtering" section.
+
+\section{Noise filtering}
+ Let's assume that $u$ is a bidimensional clean original data. $u_0$ is a version of $u$, which we receive, the one polluted with the noise $n$.
+\[
+	u_0 = u + n
+\]
+The problem, which we want to solve is to perform manipulations on given $u_0$ to obtain $u$.
+Let's assume, that our input $u$ is represented in matrix form. Let's use SVD on this matrix.
+\[
+	A = U\Sigma V^T
+\]
+Let's add additional constraint to diagonal matrix $\Sigma$. The following condition should be true - $\Sigma_{11} \geq \Sigma_{22} \geq ... \geq \Sigma_{nn} $ (it's a very important thing about $\Sigma$; it's diagonal elements should be decreasing).
+\newline
+Denoising techniques via SVD is based on following assumption: $\Sigma$ matrix can be partioned into two blocks $\Sigma_u$ and $\Sigma_n$ by some threshold index $\tau$. 
+\[
+\Sigma=
+\begin{bmatrix}
+\Sigma_u & 0 \\
+0 & \Sigma_n
+\end{bmatrix}
+\]
+Therefore, by performing the reconstruction of the original matrix using $\tau$  singular values and corresponding vectors we should receive a denoised signal.
+\newline
+We will call this approach to noise filtering a \textbf{noise suppression via compression}.
+\newline
+\subsection{Naive algorithm}
+Our baseline implementation consisted of 4 steps.
+\begin{itemize}
+	\item Preprocess raw .wav files into frame matrices
+	\item Decompose matrices using self-implemented reduced and full SVD algorithms
+	\item Reconstruct frame matrices using some percentage $p$ of top singular values and corresponding vectors
+	\item Write reconstructed structures to new .wav files
+\end{itemize}
+All of the above steps can be viewed in our GitHub repository[4].
+From noise filtering point of view, results of this naive approach were poor. Based on choosing of $p$ hyperparameter, we received some noise filtering effect, but it was far from adequate results. 
+\newline
+Still, if we look at this approach from data compressing point of view, the results were quite fascinating. Using an only quarter of all elements, the difference between restored and original file were barely distinguishable for the human ear.
+\subsection{"Window" process}
+Our algorithm for more sophisticated noise filtering was highly inspired by a paper about denoising images [5]. "Window" process, which we perform on matrix $A$ is intuitively similar to Convolution layers in Deep Neural Networks.
+\newline
+Let $A$ be the frame matrix, defined as follows:
+\[
+A \in \mathbb{R}^{m \times n}, m,n \in \mathbb{N}
+\]
+We try to receive $\hat{A}$ frame matrix which is a denoised version of $A$
+\[
+\hat{A} \in \mathbb{R}^{m \times n}, m,n \in \mathbb{N}
+\]
+We choose values $p$ and $l$:
+\[
+	 p,l \in \mathbb{N}, p < \frac{m}{2}, l < \frac{n}{2}
+\]
+ Additionaly, we choose value stride $s \in \mathbb{N} $.
+ \newline
+ Starting from left edge of matrix $A$ we select subsection of $A$ of size $p \times l$ and perform SVD on this part. We add $k$ approximation of original subsection to corresponding area of predicted output $\hat{A}$, and move the start of the next subsection on $s$ columns and repeating this step, while we don't reach the right end of matrix $A$($r * s + p < m$, where $r$ - number of iterations). We follow the same algorithm to go down the rows of $A$. In the end we average values of $\hat{A}$.
+\subsection{Windowed algorithm}
+
+Our algorithm can be described in the following steps:
+\begin{itemize}
+	\item Preprocess raw .wav files into frame matrices
+	\item Retrieve $\hat{A}$ by running "window" process
+	\item Write $\hat{A}$ to new .wav files
+\end{itemize}
+
+\subsection{Results analysis}
+Due to computational complexity, objective measurements will be provided in our GitHub repository.
+\newline
+From a subjective point of view, the windowed algorithm performs a better job of denoising signal, but the process of choosing hyperparameters is highly unobvious and outrageously mechanical.
+
+\section{Comparison with other algorithms}
+
+Nowadays, state-of-the-art solution for the noise reduction on signal is Deep Recurrent Neural Networks. They provide an output of the excellent quality and shaping a new area in business already[6]. The main idea is to combine classic signal processing with deep learning to create a real-time noise suppression algorithm that's small and fast.
+\newline
+Despite much better performance, it is hard to grasp an intuitive understanding of how those algorithms work. Computational complexity for training such a system is very high, therefore, training such Nets requires powerful and expensive hardware.
+\newline
+Speaking about more generic solutions, partial differential equations are used for both image and sound noise reduction. Fourth-order differential equations are derived as the process that seeks to minimize a function proportional to the absolute value of Laplacian of the intensity function. With time they are converging to the output of good quality. Example of the combination of this approach and SVD denoising can be found in [7].
+\newline 
+It is also worth saying that there are pure statistical methods of noise suppression. Speaking about Bayesian methods, it is effective to treat sound's data as a Bayesian prior and the auto-normal density as a likelihood function, with the resulting posterior distribution offering a mean or mode as a denoised sound.
+\newline
+SVD-based noise suppression has a good tradeoff when we speak about complexity and the quality of output. It is easy to understand and to implement, though, unfortunately, have no implementation in business since small and elegant deep learning models already exist, providing better output.
+
+\section{Conclusion}
+
+As we see from the previous section, SVD-based algorithms are not providing the best result in terms of noise reduction problem. However, it is a good example for understanding of how SVD works. We hope, that implemented python code and this paper would help readers with understanding the practical method implementations overall.
+\newline
+Noise reduction is a common task and algorithms for solving it are mostly developed in a supervised environment. However, algorithms which we implemented allow performing a computationally cheap approximation of denoised signal in terms of unsupervised environment.
+\newline
+Overall SVD is a brilliant and easy-to-use tool to understand the matrix nature and can be used in various problems.
+\newline
+Along the solving noise reduction problem, we one more time reassured ourselves in power of SVD for data compression problem. 
+\newpage
+
+
+\begin{thebibliography}{9} 
+	\bibitem{website}
+	David C, Lay, Stephen R. Lay, Judi J. MacDonald. \textit{Linear Algebra and Its Applications.} Pearson Education Limited, 5th edition, 2016.
+	\bibitem{website}
+	Stephen Boyd, Lieven Vandenberghe. \textit{Introduction to Applied Linear Algebra: Vectors, Matrices, and Least Squares.} Cambridge University Press, 2018
+	\bibitem{website}
+	Interview with former Ukrainian president: Borsch Philosophy
+	\\\texttt{https://youtu.be/KLxHLeVIB7c?t=700}
+	
+	\bibitem{website} 
+	Supportive code
+	\\\texttt{https://github.com/baaraban/noise\char`_reduction}
+	\bibitem{website}
+	Tsegaselassie Workalemahu. \textit{Singular Value Decomposition in Image Noise Filtering and Reconstruction.} Thesis, Georgia State University, 2008.
+	\\\texttt{https://scholarworks.gsu.edu/math\char`_theses/52}
+	\bibitem{website}
+	Business implementation of noise filtering with Deep Reccurent Neural Networks
+	\\\texttt{https://2hz.ai/samples/index.html}
+	\bibitem{website}
+	George Baravdish, Gianpaolo Evangelista, Olof Svensson. \textit{PDE-SVD BASED AUDIO DENOISING.}
+	\\\texttt{	http://liu.diva-portal.org/smash/get/diva2:535821/FULLTEXT01.pdf}
+\end{thebibliography}
+
+
+\end{document}
