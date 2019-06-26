@@ -2,3 +2,4 @@ pandas
 numpy
 googlemaps
 tqdm
+matplotlib
